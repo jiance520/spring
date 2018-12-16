@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans
+	xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:aop="http://www.springframework.org/schema/aop"  
+    xmlns:context="http://www.springframework.org/schema/context"  
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+	http://www.springframework.org/schema/beans/spring-beans-3.1.xsd 
+	http://www.springframework.org/schema/aop 
+	http://www.springframework.org/schema/aop/spring-aop-3.1.xsd  
+    http://www.springframework.org/schema/context 
+    http://www.springframework.org/schema/context/spring-context-3.1.xsd
+	http://www.springframework.org/schema/tx 
+	http://www.springframework.org/schema/tx/spring-tx-3.1.xsd" 
+	xmlns:tx="http://www.springframework.org/schema/tx">
+ 	<bean id="user" class="com.entity.Users" scope="prototype">
+ 		<property name="name">
+ 			<value>张飞</value>
+ 		</property>
+ 		<property name="age">
+ 			<value>18</value>
+ 		</property>
+ 		<property name="sex">
+ 			<value>男</value>
+ 		</property>
+ 	</bean>
+    <bean id="house" class="com.entity.House">
+    	<property name="hname">
+    		<value><![CDATA[<xxxx大夏>]]></value>
+    	</property>
+    	<property name="u2" ref="user">
+    	</property>
+    </bean>
+    <bean id="car1" class="com.entity.Car" p:brand="奔驰" p:user-ref="user"></bean>
+    <bean id="car2" class="com.entity.Car" autowire="byName">
+    	    <property name="brand">
+    		<value>宝马</value>
+    	</property>
+    </bean>
+    <bean id="paper" class="com.service.impl.A4Paper"></bean>
+    <bean id="box" class="com.service.impl.ColorBox"></bean>
+    <bean id="print" class="com.service.impl.Print" autowire="byName"></bean>
+    
+    <bean id="demo" class="com.service.impl.Demo"></bean>
+    
+    <bean id="after" class="com.aop.AfterBean"></bean>
+    <!-- <bean id="after" class="com.aop.AfterInterceptor"></bean> -->
+    <bean id="before" class="com.aop.BeforeInterceptor"></bean>
+    <bean id="round" class="com.aop.RoundInterceptor"></bean>
+    <bean id="userbean" class="com.aop.UserInterceptor"></bean>
+    
+    <aop:config>
+    	<aop:pointcut expression="execution(public * com.service..*.*(..))" id="hehe"/>
+    	<!-- <aop:advisor advice-ref="after" pointcut-ref='hehe'/> --> 
+    	<!-- <aop:advisor advice-ref="before" pointcut-ref='hehe'/>  -->
+    	<!-- <aop:advisor advice-ref="round" pointcut-ref='hehe'/> -->
+    	
+	    <aop:aspect ref="userbean">
+    		<!-- <aop:before method="before" pointcut-ref="hehe"/>
+    		<aop:after-returning method="after" pointcut-ref="hehe" returning="result"/> -->
+    		<aop:around method="round" pointcut-ref="hehe"/>
+    	</aop:aspect>
+    </aop:config>
+</beans>

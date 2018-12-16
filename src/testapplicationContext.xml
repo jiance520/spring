@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans
+	xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:aop="http://www.springframework.org/schema/aop"  
+    xmlns:context="http://www.springframework.org/schema/context"  
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+	http://www.springframework.org/schema/beans/spring-beans-3.1.xsd 
+	http://www.springframework.org/schema/aop 
+	http://www.springframework.org/schema/aop/spring-aop-3.1.xsd  
+    http://www.springframework.org/schema/context 
+    http://www.springframework.org/schema/context/spring-context-3.1.xsd
+	http://www.springframework.org/schema/tx 
+	http://www.springframework.org/schema/tx/spring-tx-3.1.xsd" 
+	xmlns:tx="http://www.springframework.org/schema/tx">
+ 	<bean id="user" class="com.entity.Users" scope="prototype">
+ 		<property name="name">
+ 			<value>张飞</value>
+ 		</property>
+ 		<property name="age">
+ 			<value>18</value>
+ 		</property>
+ 		<property name="sex">
+ 			<value>男</value>
+ 		</property>
+ 	</bean>
+ 	<!-- 给Car中的属性user自动注入id=user的值 -->
+ 	<bean id="car" class="com.entity.Car" autowire="byName">
+ 		<property name="brand"><value>猫</value></property>
+ 	</bean>
+ 	<!-- 构造注入属性值 -->
+ 	<bean id="allUser" class="com.entity.AllUsers" scope="prototype">
+ 		<!--给allUser对象的属性注入值 index下标从0开始，0表示这个入参在构造法中的第一个，type指向该入参的类型 -->
+ 		<!-- 对于引用型入参，可以不指定type的值，使用ref和bean组合来引入 -->
+ 		<constructor-arg index="0" type="String"><value>123</value></constructor-arg>
+ 		<!--给allUser对象的属性引入值  -->
+ 		<constructor-arg><ref bean="user"/></constructor-arg><!-- 构造法注入：引入bean -->
+ 	</bean>
+ 	<!-- 使用P命名空间注入值 p:属性名="属性值"-->
+ 	<bean id="mapper" class="com.entity.Mapper" p:str="mapper的str"></bean>
+ 	<!-- 使用P注入引用  p:属性名-ref="引入的id"-->
+ 	<bean id="testService" class="com.service.impl.TestService" p:mapper-ref="mapper"></bean>
+ 	<bean id="testEntity" class="com.entity.TestEntity" scope="prototype">
+ 		<!-- 注入特殊字符 -->
+ 		<property name="str">
+ 			<value>P&amp;G</value>
+ 		</property>
+ 		<!-- 注入特殊字符 -->
+ 		<property name="testr">
+ 			<value><![CDATA[<xxxx大夏>]]></value>
+ 		</property>
+ 		<!-- 给对象的属性user注入值 -->
+<!-- 	<property name="user">
+ 	 		<bean class="com.entity.Users"><内部bean:在bean的内部再使用bean来注入对象属性值 
+ 	 			<property name="name">
+ 					<value>张飞</value>
+ 				</property>
+ 	 		</bean>
+ 		</property> -->
+ 	 	<property name="user" ref="user"><!-- 引用bean:ref -->
+ 		</property>
+ 		<!-- 给对象的属性list注入值 -->
+ 		<property name="list">
+ 			<list>
+ 				<value>足球</value>
+ 				<value>篮球</value>
+ 			</list>
+ 		</property>
+ 		<!-- 给对象的属性数组注入值 -->
+ 		<property name="array">
+ 			<list>
+ 				<value>足球</value>
+ 				<value>篮球</value>
+ 			</list>
+ 		</property>
+ 		<!-- 给对象的属性set注入值 -->
+ 		<property name="set">
+ 			<set>
+ 				<value>足球</value>
+ 				<value>篮球</value>
+ 			</set>
+ 		</property>
+ 		<!-- 给对象的属性map注入值 -->
+ 		<property name="map">
+ 			<map>
+ 				<entry>
+ 					<key><value>football</value></key>
+ 					<value>足球</value>
+ 				</entry>
+ 				<entry>
+ 					<key><value>basketball</value></key>
+ 					<value>篮球</value>
+ 				</entry>
+ 			</map>
+ 		</property>
+ 		<!-- 给类的属性，Properties类型的对象引用props注入值 -->
+ 		<property name="props">
+ 			<props>
+ 				<prop key="football">足球</prop>
+ 				<prop key="basketball">篮球</prop>
+ 			</props>
+ 		</property>
+ 		<!-- 注入空字符串 -->
+ 		<property name="emptyvalue">
+ 			<value></value>
+ 		</property>
+ 		<!-- 注入null -->
+ 		<property name="nullvalue">
+ 			<null/>
+ 		</property>	 
+ 	</bean>
+ 	<!-- 可使用的切点pointcut id=hehe，增强代理类after，expression要使用增强的被代理类的方法， -->
+ 	<!-- 引入代理类advice-ref="after"，使用的切点pointcut-ref=hehe -->
+ 	<bean id="after" class="com.aop.AfterBean"></bean>
+ 	<bean id="userbean" class="com.aop.UserInterceptor"/>
+    <aop:config>
+    	<aop:pointcut expression="execution(public * com.service..*.*(..))" id='hehe'/>
+    	<aop:advisor advice-ref="after" pointcut-ref="hehe"/>
+    	<!--引入增强代理类ref  -->
+    	<aop:aspect ref="userbean">
+    		<!-- 使用代理类的方法method=round -->
+    		<aop:around method="round" pointcut-ref="hehe"/>
+    	</aop:aspect>
+    </aop:config>   
+</beans>
